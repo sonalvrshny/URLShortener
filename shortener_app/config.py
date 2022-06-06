@@ -5,7 +5,7 @@ from pydantic import BaseSettings
 
 # Settings is a subclass of BaseSettings
 # BaseSettings used to define env variables - only have to define variables
-# you want to use, others are assumed default
+# you want to use, others are assumed default by pydantic
 class Settings(BaseSettings):
     env_name: str = "Local"
     base_url: str = "http://localhost:8000"

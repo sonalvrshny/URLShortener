@@ -1,0 +1,15 @@
+## Dependencies
+- While downloading the dependencies, I used virtual environment - this allows dependencies to be installed not 
+system-wide but only in project's environment
+- Used the following to activate:
+'''
+$ python3 -m venv venv
+$ source venv/bin/activate
+'''
+
+- FastAPI for web framework 
+- Uvicorn to run the web server 
+- SQLAlchemy is used to interact with database - Object-Relational mapper(OLM) used to declare interactions with SQLite
+- python-dotenv for env variables
+- validators - used to validate email addresses, IP addresses
+-------------------------------------------------------------------------------------------------------------------
