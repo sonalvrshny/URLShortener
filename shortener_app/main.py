@@ -1,10 +1,17 @@
 # FastAPI implementation that has one endpoint 
 
-from fastapi import FastAPI
+from curses.ascii import HT
+import validators
+from fastapi import FastAPI, HTTPException
+
+from . import schemas
 
 # define app by instantiating FastAPI
 # the app variable is the main point of interaction to create the API
 app = FastAPI()
+
+def raise_bad_request(message):
+    raise HTTPException(status_code=400, detail=message)
 
 # path operation decorator associates root path with read_root()
 # by registering it with FastAPI
@@ -15,6 +22,12 @@ app = FastAPI()
 def read_root():
     return "Welcome to URL Shortener app :)"
 
+# create_url endpoint expects a URL string as POST request 
+@app.post("/url")
+def create_url(url: schemas.URLBase):
+    if not validators.url(url.target_url):
+        raise_bad_request("Your provided URL is not valid")
+    return f"TODO:Create database entry for: {url.target_url}"
 
 # to run the app, we need a server 
 # $ uvicorn shortener_app.main:app --reload
