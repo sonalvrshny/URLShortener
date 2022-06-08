@@ -2,7 +2,8 @@
 
 import secrets
 import validators
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from . import models, schemas
@@ -21,6 +22,10 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def raise_not_found(request):
+    message = f"URL '{request.url}' does not exist"
+    raise HTTPException(status_code=404, detail=message)
 
 def raise_bad_request(message):
     raise HTTPException(status_code=400, detail=message)
@@ -52,6 +57,20 @@ def create_url(url: schemas.URLBase, db: Session = Depends(get_db)):
     db_url.url = key
     db_url.admin_url = secret_key
     return db_url
+
+# can GET requests from URL provided as argument
+@app.get("/{url_key}")
+def forward_to_target_url(
+    url_key: str, 
+    request: Request, 
+    db: Session = Depends(get_db)
+    ):
+    db_url = (db.query(models.URL).filter(models.URL.key == url_key, models.URL.is_active).first())
+    if db_url:
+        return RedirectResponse(db_url.target_url)
+    else:
+        raise_not_found(request)
+
 
 # to run the app, we need a server 
 # $ uvicorn shortener_app.main:app --reload
