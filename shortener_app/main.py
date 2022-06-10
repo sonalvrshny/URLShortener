@@ -82,6 +82,16 @@ def get_admin_info(db_url: models.URL) -> schemas.URLInfo:
     db_url.admin_url = str(base_url.replace(path=admin_endpoint))
     return db_url
 
+@app.delete("/admin/{secret_key}")
+def delete_url(
+    secret_key: str, request: Request, db: Session = Depends(get_db)
+):
+    if db_url := crud.deactivate_db_url_by_secret_key(db, secret_key=secret_key):
+        message = f"Successfully deleted shortened URL for '{db_url.target_url}'"
+        return {"detail": message}
+    else:
+        raise_not_found(request)
+
 # to run the app, we need a server 
 # $ uvicorn shortener_app.main:app --reload
 # check http://127.0.0.1:8000
